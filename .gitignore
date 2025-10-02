@@ -9,3 +9,7 @@ Thumbs.db
 .cproject
 builtins
 /.editor_settings
+manifest.public.der
+manifest.private.der
+debug.keystore.pass.txt
+debug.keystore
