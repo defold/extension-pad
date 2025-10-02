@@ -9,8 +9,11 @@ width = 960
 height = 640
 
 [project]
-title = myextension
+title = PlayAssetDelivery
 
 [library]
 include_dirs = myextension
+
+[android]
+minimum_sdk_version = 21
 
