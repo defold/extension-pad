@@ -87,23 +87,25 @@ public class PADJNI {
     }
 
     public String GetNextEvent() {
+        Log.d(TAG, "GetNextEvent");
         PADEvent event = null;
         synchronized (events) {
-            if (!events.isEmpty()) {
-                event = events.remove(0);
+            if (events.isEmpty()) {
+                Log.d(TAG, "GetNextEvent no event");
+                return null;
             }
+            event = events.remove(0);
         }
 
+        Log.d(TAG, "GetNextEvent creating event json");
         JSONObject jo = new JSONObject();
-        if (event != null) {
-            try {
-                jo.put("pack_name", event.packName);
-                jo.put("event_type", event.eventType.ordinal());
-                jo.put("extra", event.extra);
-            }
-            catch (JSONException e) {
-                Log.e(TAG, "JSON object creation error: " + e.getMessage());
-            }
+        try {
+            jo.put("pack_name", event.packName);
+            jo.put("event_type", event.eventType.ordinal());
+            jo.put("extra", event.extra);
+        }
+        catch (JSONException e) {
+            Log.e(TAG, "JSON object creation error: " + e.getMessage());
         }
         return jo.toString();
     }

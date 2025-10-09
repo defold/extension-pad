@@ -1,3 +1,9 @@
+/**
+ * Functionality to work with Play Asset Delivery and the AssetPackManager
+ * @namespace pad
+ * @language lua
+ */
+
 #define LIB_NAME "PAD"
 #define MODULE_NAME "pad"
 
@@ -6,6 +12,8 @@
 #if defined(DM_PLATFORM_ANDROID)
 
 #include <dmsdk/dlib/android.h>
+
+
 
 struct PADJNI
 {
@@ -104,6 +112,10 @@ static char* CallCharMethodChar(jobject instance, jmethodID method, const char* 
     jstring jstr = env->NewStringUTF(cstr);
     jstring return_value = (jstring)env->CallObjectMethod(instance, method, jstr);
     env->DeleteLocalRef(jstr);
+    if (!return_value)
+    {
+        return 0;
+    }
 
     const char* result_cstr = env->GetStringUTFChars(return_value, 0);
     char* result_cstr_copy = strdup(result_cstr);
@@ -119,6 +131,10 @@ static char* CallCharMethodVoid(jobject instance, jmethodID method)
     JNIEnv* env = threadAttacher.GetEnv();
 
     jstring return_value = (jstring)env->CallObjectMethod(instance, method);
+    if (!return_value)
+    {
+        return 0;
+    }
 
     const char* result_cstr = env->GetStringUTFChars(return_value, 0);
     char* result_cstr_copy = strdup(result_cstr);
@@ -238,7 +254,7 @@ static int PADGetPackLocation(lua_State* L)
 
 /**
  * Returns the total number of bytes already downloaded for the pack.
- * NOTE: You must have called the `get_pack_state()` function first and wait for
+ * Note that you must have called the `get_pack_state()` function first and wait for
  * a `PACK_STATE_UPDATED` event before calling this function.
  * @name get_pack_bytes_downloaded
  * @string pack_name
@@ -255,7 +271,7 @@ static int PADGetPackBytesDownloaded(lua_State* L)
 
 /**
  * Returns the error code for the pack, if Play has failed to download the pack.
- * NOTE: You must have called the `get_pack_state()` function first and wait for
+ * Note that you must have called the `get_pack_state()` function first and wait for
  * a `PACK_STATE_UPDATED` event before calling this function.
  * @name get_pack_error_code
  * @string pack_name
@@ -272,7 +288,7 @@ static int PADGetPackErrorCode(lua_State* L)
 
 /**
  * Returns the download status of the pack.
- * NOTE: You must have called the `get_pack_state()` function first and wait for
+ * Note that you must have called the `get_pack_state()` function first and wait for
  * a `PACK_STATE_UPDATED` event before calling this function.
  * @name get_pack_status
  * @string pack_name
@@ -289,7 +305,7 @@ static int PADGetPackStatus(lua_State* L)
 
 /**
  * Returns the total size of the pack in bytes.
- * NOTE: You must have called the `get_pack_state()` function first and wait for
+ * Note that you must have called the `get_pack_state()` function first and wait for
  * a `PACK_STATE_UPDATED` event before calling this function.
  * @name get_pack_total_bytes_to_download
  * @string pack_name
@@ -306,7 +322,7 @@ static int PADGetPackTotalBytesToDownload(lua_State* L)
 
 /**
  * Returns the percentage of the asset pack already transferred to the app.
- * NOTE: You must have called the `get_pack_state()` function first and wait for
+ * Note that you must have called the `get_pack_state()` function first and wait for
  * a `PACK_STATE_UPDATED` event before calling this function.
  * @name get_pack_transfer_progress_percentage
  * @string pack_name
@@ -374,6 +390,7 @@ static const luaL_reg Module_methods[] =
 
 static void LuaInit(lua_State* L)
 {
+    dmLogInfo("LuaInit");
     int top = lua_gettop(L);
     luaL_register(L, MODULE_NAME, Module_methods);
     lua_pop(L, 1);
@@ -382,9 +399,10 @@ static void LuaInit(lua_State* L)
 
 
 static void JavaInit() {
+    dmLogInfo("JavaInit");
     dmAndroid::ThreadAttacher threadAttacher;
     JNIEnv* env = threadAttacher.GetEnv();
-    jclass cls = dmAndroid::LoadClass(env, "com.defold.adpf.ADPFJNI");
+    jclass cls = dmAndroid::LoadClass(env, "com.defold.pad.PADJNI");
 
     jmethodID jni_constructor = env->GetMethodID(cls, "<init>", "(Landroid/app/Activity;)V");
     g_PAD.m_JNI = env->NewGlobalRef(env->NewObject(cls, jni_constructor, threadAttacher.GetActivity()->clazz));
@@ -395,10 +413,7 @@ static void JavaInit() {
     g_PAD.m_HasPackState = env->GetMethodID(cls, "HasPackState", "(Ljava/lang/String;)Z");
     g_PAD.m_RemovePack = env->GetMethodID(cls, "RemovePack", "(Ljava/lang/String;)V");
     g_PAD.m_ShowConfirmationDialog = env->GetMethodID(cls, "ShowConfirmationDialog", "(Ljava/lang/String;)V");
-
-    g_PAD.m_GetNextEvent = env->GetMethodID(cls, "GetNextEvent", "(V)Ljava/lang/String;");
-
-    g_PAD.m_GetNextEvent = env->GetMethodID(cls, "GetNextEvent", "(V)Ljava/lang/String;");
+    g_PAD.m_GetNextEvent = env->GetMethodID(cls, "GetNextEvent", "()Ljava/lang/String;");
     g_PAD.m_GetPackBytesDownloaded = env->GetMethodID(cls, "GetPackBytesDownloaded", "(Ljava/lang/String;)J");
     g_PAD.m_GetPackErrorCode = env->GetMethodID(cls, "GetPackErrorCode", "(Ljava/lang/String;)I");
     g_PAD.m_GetPackStatus = env->GetMethodID(cls, "GetPackStatus", "(Ljava/lang/String;)I");
@@ -413,7 +428,7 @@ static void JavaInit() {
 
 dmExtension::Result AppInitializePAD(dmExtension::AppParams* params)
 {
-    dmLogInfo("AppInitializePAD\n");
+    dmLogInfo("AppInitializePAD");
     return dmExtension::RESULT_OK;
 }
 
@@ -422,7 +437,7 @@ dmExtension::Result InitializePAD(dmExtension::Params* params)
 #if !defined(DM_PLATFORM_ANDROID)
     dmLogInfo("Extension %s is not supported", LIB_NAME);
 #else
-    dmLogInfo("Registered %s Extension\n", MODULE_NAME);
+    dmLogInfo("Registered %s Extension", MODULE_NAME);
     LuaInit(params->m_L);
     JavaInit();
 #endif
@@ -431,7 +446,7 @@ dmExtension::Result InitializePAD(dmExtension::Params* params)
 
 dmExtension::Result AppFinalizePAD(dmExtension::AppParams* params)
 {
-    dmLogInfo("AppFinalizePAD\n");
+    dmLogInfo("AppFinalizePAD");
     return dmExtension::RESULT_OK;
 }
 
@@ -465,19 +480,19 @@ void OnEventPAD(dmExtension::Params* params, const dmExtension::Event* event)
     switch(event->m_Event)
     {
         case dmExtension::EVENT_ID_ACTIVATEAPP:
-            dmLogInfo("OnEventPAD - EVENT_ID_ACTIVATEAPP\n");
+            dmLogInfo("OnEventPAD - EVENT_ID_ACTIVATEAPP");
             break;
         case dmExtension::EVENT_ID_DEACTIVATEAPP:
-            dmLogInfo("OnEventPAD - EVENT_ID_DEACTIVATEAPP\n");
+            dmLogInfo("OnEventPAD - EVENT_ID_DEACTIVATEAPP");
             break;
         case dmExtension::EVENT_ID_ICONIFYAPP:
-            dmLogInfo("OnEventPAD - EVENT_ID_ICONIFYAPP\n");
+            dmLogInfo("OnEventPAD - EVENT_ID_ICONIFYAPP");
             break;
         case dmExtension::EVENT_ID_DEICONIFYAPP:
-            dmLogInfo("OnEventPAD - EVENT_ID_DEICONIFYAPP\n");
+            dmLogInfo("OnEventPAD - EVENT_ID_DEICONIFYAPP");
             break;
         default:
-            dmLogWarning("OnEventPAD - Unknown event id\n");
+            dmLogWarning("OnEventPAD - Unknown event id");
             break;
     }
 }

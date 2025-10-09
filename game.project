@@ -12,8 +12,9 @@ height = 640
 title = PlayAssetDelivery
 
 [library]
-include_dirs = myextension
+include_dirs = pad
 
 [android]
 minimum_sdk_version = 21
+package = com.defold.pad
 

@@ -1,0 +1,108 @@
+- name: pad
+  type: table
+  desc: Functionality to work with Play Asset Delivery and the AssetPackManager
+
+  members:
+  - name: cancel
+    type: function
+    desc: Requests to cancel the download of the specified asset packs.
+    parameters:
+    - name: pack_name
+      type: string
+
+  - name: fetch
+    type: function
+    desc: Requests to download the specified asset pack.
+    parameters:
+    - name: pack_name
+      type: string
+
+  - name: remove_pack
+    type: function
+    desc: Deletes the specified asset pack from the internal storage of the app.
+    parameters:
+    - name: pack_name
+      type: string
+
+  - name: get_pack_state
+    type: function
+    desc: Requests download state and details for the specified asset pack. This is an asynchronous function and will send a `PACK_STATE_UPDATED` event once the new state is available.
+    parameters:
+    - name: pack_name
+      type: string
+
+  - name: get_pack_transfer_progress_percentage
+    type: function
+    desc: Returns the location of the specified asset pack on the device or an empty string if this pack is not downloaded.
+    parameters:
+    - name: pack_name
+      type: string
+    returns:
+    - name: g
+      type: strin
+
+  - name: get_pack_bytes_downloaded
+    type: function
+    desc: Returns the total number of bytes already downloaded for the pack. Note that you must have called the `get_pack_state()` function first and wait for a `PACK_STATE_UPDATED` event before calling this function.
+    parameters:
+    - name: pack_name
+      type: string
+    returns:
+    - name: d
+      type: bytes_downloade
+
+  - name: get_pack_error_code
+    type: function
+    desc: Returns the error code for the pack, if Play has failed to download the pack. Note that you must have called the `get_pack_state()` function first and wait for a `PACK_STATE_UPDATED` event before calling this function.
+    parameters:
+    - name: pack_name
+      type: string
+    returns:
+    - name: e
+      type: error_cod
+
+  - name: get_pack_status
+    type: function
+    desc: Returns the download status of the pack. Note that you must have called the `get_pack_state()` function first and wait for a `PACK_STATE_UPDATED` event before calling this function.
+    parameters:
+    - name: pack_name
+      type: string
+    returns:
+    - name: s
+      type: statu
+
+  - name: get_pack_total_bytes_to_download
+    type: function
+    desc: Returns the total size of the pack in bytes. Note that you must have called the `get_pack_state()` function first and wait for a `PACK_STATE_UPDATED` event before calling this function.
+    parameters:
+    - name: pack_name
+      type: string
+    returns:
+    - name: d
+      type: bytes_to_downloa
+
+  - name: get_pack_transfer_progress_percentage
+    type: function
+    desc: Returns the percentage of the asset pack already transferred to the app. Note that you must have called the `get_pack_state()` function first and wait for a `PACK_STATE_UPDATED` event before calling this function.
+    parameters:
+    - name: pack_name
+      type: string
+    returns:
+    - name: r
+      type: numbe
+
+  - name: show_confirmation_dialog
+    type: function
+    desc: Shows a dialog that asks the user for consent to download packs Shows a dialog that asks the user for consent to download packs that are currently in either the AssetPackStatus.REQUIRES_USER_CONFIRMATION state or the AssetPackStatus.WAITING_FOR_WIFI state. Will return result in event listener.
+    parameters:
+    - name: pack_name
+      type: string
+
+  - name: set_listener
+    type: function
+    desc: Set listener to receive events
+    parameters:
+    - name: listener
+      type: function
+      desc: The function to call (self, event)
+
