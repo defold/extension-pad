@@ -17,4 +17,8 @@ include_dirs = pad
 [android]
 minimum_sdk_version = 21
 package = com.defold.pad
+version_code = 12
+
+[liveupdate]
+mount_on_start = 0
 

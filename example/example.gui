@@ -1,0 +1,229 @@
+script: "/example/example.gui_script"
+fonts {
+  name: "default"
+  font: "/builtins/fonts/default.font"
+}
+textures {
+  name: "ui"
+  texture: "/example/assets/ui.atlas"
+}
+nodes {
+  position {
+    x: 121.0
+    y: 171.0
+  }
+  type: TYPE_TEMPLATE
+  id: "fetch"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "fetch/button"
+  parent: "fetch"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "FETCH"
+  id: "fetch/text"
+  parent: "fetch/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 121.0
+    y: 113.0
+  }
+  type: TYPE_TEMPLATE
+  id: "remove"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "remove/button"
+  parent: "remove"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "REMOVE"
+  id: "remove/text"
+  parent: "remove/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 317.0
+    y: 171.0
+  }
+  type: TYPE_TEMPLATE
+  id: "get_state"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "get_state/button"
+  parent: "get_state"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "GET STATE"
+  id: "get_state/text"
+  parent: "get_state/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 513.0
+    y: 171.0
+  }
+  type: TYPE_TEMPLATE
+  id: "print_state"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "print_state/button"
+  parent: "print_state"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "PRINT STATE"
+  id: "print_state/text"
+  parent: "print_state/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 705.0
+    y: 171.0
+  }
+  type: TYPE_TEMPLATE
+  id: "pack_location"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "pack_location/button"
+  parent: "pack_location"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "PACK LOCATION"
+  id: "pack_location/text"
+  parent: "pack_location/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 705.0
+    y: 113.0
+  }
+  type: TYPE_TEMPLATE
+  id: "mount"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "mount/button"
+  parent: "mount"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "MOUNT ASSET PACK"
+  id: "mount/text"
+  parent: "mount/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 705.0
+    y: 57.0
+  }
+  type: TYPE_TEMPLATE
+  id: "missing_resources"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "missing_resources/button"
+  parent: "missing_resources"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "MISSING RESOURCES"
+  id: "missing_resources/text"
+  parent: "missing_resources/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
+    x: 31.0
+    y: 203.0
+  }
+  size {
+    x: 800.0
+    y: 400.0
+  }
+  type: TYPE_TEXT
+  text: "<text>"
+  font: "default"
+  id: "info"
+  pivot: PIVOT_SW
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 898.0
+    y: 590.0
+  }
+  type: TYPE_TEMPLATE
+  id: "exit"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  size {
+    x: 45.0
+    y: 45.0
+  }
+  type: TYPE_BOX
+  id: "exit/button"
+  parent: "exit"
+  overridden_fields: 4
+  template_node_child: true
+}
+nodes {
+  size {
+    x: 40.0
+    y: 40.0
+  }
+  type: TYPE_TEXT
+  text: "X"
+  id: "exit/text"
+  parent: "exit/button"
+  overridden_fields: 4
+  overridden_fields: 8
+  template_node_child: true
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

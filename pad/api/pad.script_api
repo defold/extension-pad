@@ -31,7 +31,7 @@
     - name: pack_name
       type: string
 
-  - name: get_pack_transfer_progress_percentage
+  - name: get_pack_location
     type: function
     desc: Returns the location of the specified asset pack on the device or an empty string if this pack is not downloaded.
     parameters:
@@ -105,4 +105,140 @@
     - name: listener
       type: function
       desc: The function to call (self, event)
+
+  - name: EVENT_PACK_STATE_UPDATED
+    type: number
+    desc: 
+
+  - name: EVENT_PACK_STATE_ERROR
+    type: number
+    desc: 
+
+  - name: EVENT_REMOVE_PACK_COMPLETED
+    type: number
+    desc: 
+
+  - name: EVENT_REMOVE_PACK_CANCELED
+    type: number
+    desc: 
+
+  - name: EVENT_REMOVE_PACK_ERROR
+    type: number
+    desc: 
+
+  - name: EVENT_DIALOG_CONFIRMED
+    type: number
+    desc: 
+
+  - name: EVENT_DIALOG_DECLINED
+    type: number
+    desc: 
+
+  - name: EVENT_DIALOG_CANCELED
+    type: number
+    desc: 
+
+  - name: EVENT_DIALOG_ERROR
+    type: number
+    desc: 
+
+  - name: STATUS_UNKNOWN
+    type: number
+    desc: 
+
+  - name: STATUS_PENDING
+    type: number
+    desc: 
+
+  - name: STATUS_DOWNLOADING
+    type: number
+    desc: 
+
+  - name: STATUS_TRANSFERRING
+    type: number
+    desc: 
+
+  - name: STATUS_COMPLETED
+    type: number
+    desc: 
+
+  - name: STATUS_FAILED
+    type: number
+    desc: 
+
+  - name: STATUS_CANCELED
+    type: number
+    desc: 
+
+  - name: STATUS_WAITING_FOR_WIFI
+    type: number
+    desc: 
+
+  - name: STATUS_NOT_INSTALLED
+    type: number
+    desc: 
+
+  - name: STATUS_REQUIRES_USER_CONFIRMATION
+    type: number
+    desc: 
+
+  - name: ERRORCODE_ACCESS_DENIED
+    type: number
+    desc: Download not permitted under the current device circumstances 
+
+  - name: ERRORCODE_API_NOT_AVAILABLE
+    type: number
+    desc: The Asset Delivery API isn&#x27;t available. 
+
+  - name: ERRORCODE_APP_NOT_OWNED
+    type: number
+    desc: The app isn&#x27;t owned by any user on this device. 
+
+  - name: ERRORCODE_APP_UNAVAILABLE
+    type: number
+    desc: The requesting app is unavailable. 
+
+  - name: ERRORCODE_CONFIRMATION_NOT_REQUIRED
+    type: number
+    desc: Returned if AssetPackManager.showConfirmationDialog(Activity) is called but no asset packs require user confirmation. 
+
+  - name: ERRORCODE_DOWNLOAD_NOT_FOUND
+    type: number
+    desc: The requested download isn&#x27;t found. 
+
+  - name: ERRORCODE_INSUFFICIENT_STORAGE
+    type: number
+    desc: Asset pack download failed due to insufficient storage. 
+
+  - name: ERRORCODE_INTERNAL_ERROR
+    type: number
+    desc: Unknown error downloading an asset pack. 
+
+  - name: ERRORCODE_INVALID_REQUEST
+    type: number
+    desc: The request is invalid. 
+
+  - name: ERRORCODE_NETWORK_ERROR
+    type: number
+    desc: Network error. 
+
+  - name: ERRORCODE_NETWORK_UNRESTRICTED
+    type: number
+    desc: Returned if AssetPackManager.showCellularDataConfirmation(Activity) is called but no asset packs are waiting for Wi-Fi. 
+
+  - name: ERRORCODE_NO_ERROR
+    type: number
+    desc: 
+
+  - name: ERRORCODE_PACK_UNAVAILABLE
+    type: number
+    desc: The requested asset pack isn&#x27;t available. 
+
+  - name: ERRORCODE_PLAY_STORE_NOT_FOUND
+    type: number
+    desc: The Play Store app is either not installed or not the official version. 
+
+  - name: ERRORCODE_UNRECOGNIZED_INSTALLATION
+    type: number
+    desc: The installed app version is not recognized by Play. 
 

@@ -27,25 +27,27 @@ import com.google.android.play.core.assetpacks.AssetPackManager;
 import com.google.android.play.core.assetpacks.AssetPackStates;
 import com.google.android.play.core.assetpacks.AssetPackState;
 import com.google.android.play.core.assetpacks.AssetPackLocation;
+import com.google.android.play.core.assetpacks.AssetPackStateUpdateListener;
 import com.google.android.play.core.assetpacks.model.AssetPackErrorCode;
 import com.google.android.play.core.assetpacks.model.AssetPackStatus;
 
 
-public class PADJNI {
-    private static final String TAG = "PADJNI";
+public class PADJNI implements AssetPackStateUpdateListener {
+    private static final String TAG = "defold";
 
+    // repeated in pad.cpp
     private enum PADEventType {
-        PACK_STATE_UPDATED,
-        PACK_STATE_ERROR,
+        EVENT_PACK_STATE_UPDATED,
+        EVENT_PACK_STATE_ERROR,
         
-        REMOVE_PACK_COMPLETED,
-        REMOVE_PACK_CANCELED,
-        REMOVE_PACK_ERROR,
+        EVENT_REMOVE_PACK_COMPLETED,
+        EVENT_REMOVE_PACK_CANCELED,
+        EVENT_REMOVE_PACK_ERROR,
 
-        DIALOG_CONFIRMED,
-        DIALOG_DECLINED,
-        DIALOG_CANCELED,
-        DIALOG_ERROR,
+        EVENT_DIALOG_CONFIRMED,
+        EVENT_DIALOG_DECLINED,
+        EVENT_DIALOG_CANCELED,
+        EVENT_DIALOG_ERROR,
     }
 
     private static class PADEvent {
@@ -70,6 +72,7 @@ public class PADJNI {
         this.activity = activity;
         Log.d(TAG, "Constructor");
         assetPackManager = AssetPackManagerFactory.getInstance(activity);
+        assetPackManager.registerListener(this);
     }
 
     private void AddEvent(String packName, PADEventType eventType) {
@@ -87,11 +90,11 @@ public class PADJNI {
     }
 
     public String GetNextEvent() {
-        Log.d(TAG, "GetNextEvent");
+        // Log.d(TAG, "GetNextEvent");
         PADEvent event = null;
         synchronized (events) {
             if (events.isEmpty()) {
-                Log.d(TAG, "GetNextEvent no event");
+                // Log.d(TAG, "GetNextEvent no event");
                 return null;
             }
             event = events.remove(0);
@@ -116,13 +119,37 @@ public class PADJNI {
         AssetPackStates states = assetPackManager.cancel(packNames);
         AssetPackState state = states.packStates().get(packName);
         stateCache.put(packName, state);
-        AddEvent(packName, PADEventType.PACK_STATE_UPDATED);
+        AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
     }
 
     public void Fetch(String packName) {
         Log.d(TAG, "Fetch " + packName);
         List<String> packNames = Arrays.asList(packName);
-        assetPackManager.fetch(packNames);
+        Task<AssetPackStates> task = assetPackManager.fetch(packNames);
+        task.addOnCompleteListener(new OnCompleteListener<AssetPackStates>() {
+            @Override
+            public void onComplete(@NonNull Task<AssetPackStates> task) {
+                Log.d(TAG, "Fetch onComplete");
+                AssetPackStates states = task.getResult();
+                AssetPackState state = states.packStates().get(packName);
+                stateCache.put(packName, state);
+                AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
+            }
+        });
+        task.addOnCanceledListener(new OnCanceledListener() {
+            @Override
+            public void onCanceled() {
+                Log.d(TAG, "Fetch onCanceled");
+                AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR);
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Fetch onFailure");
+                AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR, e.getMessage());
+            }
+        });
     }
 
     public boolean HasPackState(String packName) {
@@ -138,22 +165,25 @@ public class PADJNI {
         task.addOnCompleteListener(new OnCompleteListener<AssetPackStates>() {
             @Override
             public void onComplete(@NonNull Task<AssetPackStates> task) {
+                Log.d(TAG, "GetPackState onComplete");
                 AssetPackStates states = task.getResult();
                 AssetPackState state = states.packStates().get(packName);
                 stateCache.put(packName, state);
-                AddEvent(packName, PADEventType.PACK_STATE_UPDATED);
+                AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
             }
         });
         task.addOnCanceledListener(new OnCanceledListener() {
             @Override
             public void onCanceled() {
-                AddEvent(packName, PADEventType.PACK_STATE_ERROR);
+                Log.d(TAG, "GetPackState onCanceled");
+                AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR);
             }
         });
         task.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                AddEvent(packName, PADEventType.PACK_STATE_ERROR, e.getMessage());
+                Log.d(TAG, "GetPackState onFailure");
+                AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR, e.getMessage());
             }
         });
     }
@@ -197,19 +227,22 @@ public class PADJNI {
         task.addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                AddEvent(packName, PADEventType.REMOVE_PACK_COMPLETED);
+                Log.d(TAG, "RemovePack onComplete");
+                AddEvent(packName, PADEventType.EVENT_REMOVE_PACK_COMPLETED);
             }
         });
         task.addOnCanceledListener(new OnCanceledListener() {
             @Override
             public void onCanceled() {
-                AddEvent(packName, PADEventType.REMOVE_PACK_CANCELED);
+                Log.d(TAG, "RemovePack onCanceled");
+                AddEvent(packName, PADEventType.EVENT_REMOVE_PACK_CANCELED);
             }
         });
         task.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                AddEvent(packName, PADEventType.REMOVE_PACK_ERROR, e.getMessage());
+                Log.d(TAG, "RemovePack onFailure");
+                AddEvent(packName, PADEventType.EVENT_REMOVE_PACK_ERROR, e.getMessage());
             }
         });
     }
@@ -220,22 +253,30 @@ public class PADJNI {
         // task.addOnCompleteListener(new OnCompleteListener<Integer>() {
         //     @Override
         //     public void onComplete(@NonNull Task<Integer> task) {
-        //         PADEventType eventType = (task.getResult() == Activity.RESULT_OK) ? PADEventType.DIALOG_CONFIRMED : PADEventType.DIALOG_DECLINED;
+        //         PADEventType eventType = (task.getResult() == Activity.RESULT_OK) ? PADEventType.EVENT_DIALOG_CONFIRMED : PADEventType.EVENT_DIALOG_DECLINED;
         //         AddEvent(packName, eventType);
         //     }
         // });
         // task.addOnCanceledListener(new OnCanceledListener() {
         //     @Override
         //     public void onCanceled() {
-        //         AddEvent(packName, PADEventType.DIALOG_CANCELED);
+        //         AddEvent(packName, PADEventType.EVENT_DIALOG_CANCELED);
         //     }
         // });
         // task.addOnFailureListener(new OnFailureListener() {
         //     @Override
         //     public void onFailure(Exception e) {
-        //         AddEvent(packName, PADEventType.DIALOG_ERROR, e.getMessage());
+        //         AddEvent(packName, PADEventType.EVENT_DIALOG_ERROR, e.getMessage());
         //     }
         // });
 
+    }
+
+    @Override
+    public void onStateUpdate(AssetPackState state) {
+        String packName = state.name();
+        Log.d(TAG, "onStateUpdate " + packName);
+        stateCache.put(packName, state);
+        AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
     }
 }

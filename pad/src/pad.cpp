@@ -238,7 +238,7 @@ static int PADGetPackState(lua_State* L)
 /**
  * Returns the location of the specified asset pack on the device or an empty
  * string if this pack is not downloaded.
- * @name get_pack_transfer_progress_percentage
+ * @name get_pack_location
  * @string pack_name
  * @treturn string
  */
@@ -388,11 +388,179 @@ static const luaL_reg Module_methods[] =
     {0, 0}
 };
 
+
 static void LuaInit(lua_State* L)
 {
     dmLogInfo("LuaInit");
     int top = lua_gettop(L);
     luaL_register(L, MODULE_NAME, Module_methods);
+
+    // repeated in PADJNI.java
+    
+    #define SETCONSTANT(name, val) \
+    lua_pushinteger(L, (lua_Number) val); \
+    lua_setfield(L, -2, #name);
+
+    /**
+     * @field EVENT_PACK_STATE_UPDATED
+     */
+    SETCONSTANT(EVENT_PACK_STATE_UPDATED, 0);
+    /**
+     * @field EVENT_PACK_STATE_ERROR
+     */
+     SETCONSTANT(EVENT_PACK_STATE_ERROR, 1);
+    /**
+     * @field EVENT_REMOVE_PACK_COMPLETED
+     */
+     SETCONSTANT(EVENT_REMOVE_PACK_COMPLETED, 2);
+    /**
+     * @field EVENT_REMOVE_PACK_CANCELED
+     */
+     SETCONSTANT(EVENT_REMOVE_PACK_CANCELED, 3);
+    /**
+     * @field EVENT_REMOVE_PACK_ERROR
+     */
+     SETCONSTANT(EVENT_REMOVE_PACK_ERROR, 4);
+    /**
+     * @field EVENT_DIALOG_CONFIRMED
+     */
+     SETCONSTANT(EVENT_DIALOG_CONFIRMED, 5);
+    /**
+     * @field EVENT_DIALOG_DECLINED
+     */
+     SETCONSTANT(EVENT_DIALOG_DECLINED, 6);
+    /**
+     * @field EVENT_DIALOG_CANCELED
+     */
+     SETCONSTANT(EVENT_DIALOG_CANCELED, 7);
+    /**
+     * @field EVENT_DIALOG_ERROR
+     */
+     SETCONSTANT(EVENT_DIALOG_ERROR, 8);
+
+
+    /**
+     * @field STATUS_UNKNOWN
+     */
+    SETCONSTANT(STATUS_UNKNOWN, 0)
+    /**
+     * @field STATUS_PENDING
+     */
+    SETCONSTANT(STATUS_PENDING, 1)
+    /**
+     * @field STATUS_DOWNLOADING
+     */
+    SETCONSTANT(STATUS_DOWNLOADING, 2)
+    /**
+     * @field STATUS_TRANSFERRING
+     */
+    SETCONSTANT(STATUS_TRANSFERRING, 3)
+    /**
+     * @field STATUS_COMPLETED
+     */
+    SETCONSTANT(STATUS_COMPLETED, 4)
+    /**
+     * @field STATUS_FAILED
+     */
+    SETCONSTANT(STATUS_FAILED, 5)
+    /**
+     * @field STATUS_CANCELED
+     */
+    SETCONSTANT(STATUS_CANCELED, 6)
+    /**
+     * @field STATUS_WAITING_FOR_WIFI
+     */
+    SETCONSTANT(STATUS_WAITING_FOR_WIFI, 7)
+    /**
+     * @field STATUS_NOT_INSTALLED
+     */
+    SETCONSTANT(STATUS_NOT_INSTALLED, 8)
+    /**
+     * @field STATUS_REQUIRES_USER_CONFIRMATION
+     */
+    SETCONSTANT(STATUS_REQUIRES_USER_CONFIRMATION, 9)
+
+
+
+    /** Download not permitted under the current device circumstances
+     * @field ERRORCODE_ACCESS_DENIED
+     */
+    SETCONSTANT(ERRORCODE_ACCESS_DENIED, -7)
+
+    /** The Asset Delivery API isn't available.
+     * @field ERRORCODE_API_NOT_AVAILABLE
+     */
+    SETCONSTANT(ERRORCODE_API_NOT_AVAILABLE, -5)
+
+    /** The app isn't owned by any user on this device.
+     * @field ERRORCODE_APP_NOT_OWNED
+     */
+    SETCONSTANT(ERRORCODE_APP_NOT_OWNED, -13)
+
+    /** The requesting app is unavailable.
+     * @field ERRORCODE_APP_UNAVAILABLE
+     */
+    SETCONSTANT(ERRORCODE_APP_UNAVAILABLE, -1)
+
+    /** Returned if AssetPackManager.showConfirmationDialog(Activity) is called but no asset packs require user confirmation.
+     * @field ERRORCODE_CONFIRMATION_NOT_REQUIRED
+     */
+    SETCONSTANT(ERRORCODE_CONFIRMATION_NOT_REQUIRED, -14)
+
+    /** The requested download isn't found.
+     * @field ERRORCODE_DOWNLOAD_NOT_FOUND
+     */
+    SETCONSTANT(ERRORCODE_DOWNLOAD_NOT_FOUND, -4)
+
+    /** Asset pack download failed due to insufficient storage.
+     * @field ERRORCODE_INSUFFICIENT_STORAGE
+     */
+    SETCONSTANT(ERRORCODE_INSUFFICIENT_STORAGE, -10)
+
+    /** Unknown error downloading an asset pack.
+     * @field ERRORCODE_INTERNAL_ERROR
+     */
+    SETCONSTANT(ERRORCODE_INTERNAL_ERROR, -100)
+
+    /** The request is invalid.
+     * @field ERRORCODE_INVALID_REQUEST
+     */
+    SETCONSTANT(ERRORCODE_INVALID_REQUEST, -3)
+
+    /** Network error.
+     * @field ERRORCODE_NETWORK_ERROR
+     */
+    SETCONSTANT(ERRORCODE_NETWORK_ERROR, -6)
+
+    /** Returned if AssetPackManager.showCellularDataConfirmation(Activity) is called but no asset packs are waiting for Wi-Fi.
+     * @field ERRORCODE_NETWORK_UNRESTRICTED
+     */
+    SETCONSTANT(ERRORCODE_NETWORK_UNRESTRICTED, -12)
+
+    /** 
+     * @field ERRORCODE_NO_ERROR
+     */
+    SETCONSTANT(ERRORCODE_NO_ERROR, 0)
+
+    /** The requested asset pack isn't available.
+     * @field ERRORCODE_PACK_UNAVAILABLE
+     */
+    SETCONSTANT(ERRORCODE_PACK_UNAVAILABLE, -2)
+
+    /** The Play Store app is either not installed or not the official version.
+     * @field ERRORCODE_PLAY_STORE_NOT_FOUND
+     */
+    SETCONSTANT(ERRORCODE_PLAY_STORE_NOT_FOUND, -11)
+
+    /** The installed app version is not recognized by Play.
+     * @field ERRORCODE_UNRECOGNIZED_INSTALLATION
+     */
+    SETCONSTANT(ERRORCODE_UNRECOGNIZED_INSTALLATION, -15)
+
+
+    #undef SETCONSTANT
+
+
     lua_pop(L, 1);
     assert(top == lua_gettop(L));
 }
