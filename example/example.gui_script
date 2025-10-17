@@ -1,6 +1,7 @@
 local prettify = require("example.prettify")
 
 local ASSETPACK1_NAME = "asset_pack_1"
+local ASSETPACK2_NAME = "asset_pack_2"
 local ASSETPACK1_PROXY = "#assetpack1proxy"
 
 -- https://developer.android.com/reference/com/google/android/play/core/assetpacks/model/AssetPackStatus.html#UNKNOWN
@@ -43,7 +44,7 @@ end
 local log_entries = {}
 local function log(v, ...)
 	local text = (type(v) == "table") and prettify(v) or v:format(...)
-	if #log_entries == 10 then
+	if #log_entries == 15 then
 		table.remove(log_entries, 1)
 	end
 	log_entries[#log_entries + 1] = text
@@ -68,7 +69,7 @@ local function log_pack_state(pack_name)
 		local downloaded = pad.get_pack_bytes_downloaded(pack_name)
 		local total = pad.get_pack_total_bytes_to_download(pack_name)
 		local percentage = pad.get_pack_transfer_progress_percentage(pack_name)
-		log("transferring %d / %d %%%d", downloaded, total, percentage)
+		log("transferring %d / %d %d%%", downloaded, total, percentage)
 	else
 		local total = pad.get_pack_total_bytes_to_download(pack_name)
 		log("size %d", total)
@@ -82,8 +83,33 @@ local function log_pack_state(pack_name)
 
 end
 
+-- load the Defold logo from assetpack path
+local function load_logo(self, path)
+	if self.texture_id then
+		log("image already loaded")
+		return
+	end
+
+	local f = io.open(path, "rb")
+	local data = f:read("*a")
+	local img = image.load(data, { premultiply_alpha = true })
+	if not img then 
+		log("unable to load image")
+		return
+	end
+
+	local texture_id = "fast-follow-logo-texture"
+	if gui.new_texture(texture_id, img.width, img.height, img.type, img.buffer) then
+		self.texture_id = texture_id
+		gui.set_texture(gui.get_node("fast-follow-logo"), texture_id)
+		log("set new texture")
+	else
+		log("unable to create texture")
+	end
+end
+
 function init(self)
-	log("init v %d", sys.get_config_int("android.version_code", 0))
+	log("init v.%d", sys.get_config_int("android.version_code", 0))
 
 	log("removing live update mounts")
 	local mounts = liveupdate.get_mounts()
@@ -99,13 +125,17 @@ function init(self)
 	
 	if not pad then return end
 	pad.set_listener(function(_, event)
-		log("pad event")
+		log("pad event for %s", event.pack_name)
 		if event.event_type == pad.EVENT_PACK_STATE_UPDATED then
 			log_pack_state(event.pack_name)
 		else
 			log(event)
 		end
 	end)
+
+	-- request initial state for both asset packs
+	pad.get_pack_state(ASSETPACK1_NAME)
+	pad.get_pack_state(ASSETPACK2_NAME)
 end
 
 function on_input(self, action_id, action)
@@ -115,24 +145,25 @@ function on_input(self, action_id, action)
 	end
 	
 	if not pad then return end
-	if pressed("fetch/button", action) then
+
+	if pressed("fetch1/button", action) then
 		log("fetch")
 		pad.fetch(ASSETPACK1_NAME)
-	elseif pressed("remove/button", action) then
+	elseif pressed("remove1/button", action) then
 		log("remove")
 		msg.post(ASSETPACK1_PROXY, "unload")
 		liveupdate.remove_mount(ASSETPACK1_NAME)
 		pad.remove_pack(ASSETPACK1_NAME)
-	elseif pressed("get_state/button", action) then
+	elseif pressed("get_state1/button", action) then
 		print("get_state")
 		pad.get_pack_state(ASSETPACK1_NAME)
-	elseif pressed("print_state/button", action) then
+	elseif pressed("print_state1/button", action) then
 		log("print_state")
 		log_pack_state(ASSETPACK1_NAME)
-	elseif pressed("pack_location/button", action) then
+	elseif pressed("pack_location1/button", action) then
 		log("pack_location")
 		log("get_pack_location %s", pad.get_pack_location(ASSETPACK1_NAME))
-	elseif pressed("mount/button", action) then
+	elseif pressed("mount1/button", action) then
 		log("mount")
 		local path = "zip:" .. pad.get_pack_location(ASSETPACK1_NAME) .. "/assetpack1.zip"
 		log("path %s", path)
@@ -143,10 +174,23 @@ function on_input(self, action_id, action)
 				msg.post(ASSETPACK1_PROXY, "async_load")
 			end
 		end)
-	elseif pressed("missing_resources/button", action) then
+	elseif pressed("missing_resources1/button", action) then
 		log("missing_resources")
 		local missing = collectionproxy.missing_resources(ASSETPACK1_PROXY)
 		log(missing)
+	elseif pressed("fetch2/button", action) then
+		local status = pad.get_pack_status(ASSETPACK2_NAME)
+		log("status %s", PACK_STATUS_TO_TEXT[status])
+		if status == pad.STATUS_COMPLETED then
+			log("loading logo")
+			local logo_path = pad.get_pack_location(ASSETPACK2_NAME) .. "/logo-hor-classic-white-tagline.png"
+			load_logo(self, logo_path)
+		elseif status == pad.STATUS_NOT_INSTALLED then
+			log("fetch")
+			pad.fetch(ASSETPACK2_NAME)
+		else
+			log("wrong status")
+		end
 	end
 end
 

@@ -2,7 +2,7 @@
 <manifest xmlns:dist="http://schemas.android.com/apk/distribution" package="com.defold.pad" split="asset_pack_2">
     <dist:module dist:type="asset-pack">
         <dist:delivery>
-            <dist:on-demand/>
+            <dist:fast-follow/>
         </dist:delivery>
         <dist:fusing dist:include="true"/>
     </dist:module>

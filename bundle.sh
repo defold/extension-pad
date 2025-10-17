@@ -1,4 +1,3 @@
-# https://github.com/android/app-bundle-samples/tree/main/PlayAssetDelivery/BundletoolScriptSample
 set -e
 
 APP_NAME=PlayAssetDelivery
@@ -16,6 +15,7 @@ BUNDLE_DIR=$(realpath bundle)
 MAIN_AAB=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.aab
 
 # build .aab file
+# use liveupdate to get excluded content as a zip file (see liveupdate.settings)
 echo "---- BUILD MAIN AAB"
 java -jar ${BOB} --defoldsdk=1ba9e1aa422166864c3267f03f5110144b745c1e --platform=armv7-android --archive --variant=${VARIANT} --liveupdate=yes --bundle-output=${BUNDLE_DIR} --bundle-format=aab build bundle
 
@@ -23,8 +23,7 @@ java -jar ${BOB} --defoldsdk=1ba9e1aa422166864c3267f03f5110144b745c1e --platform
 # create asset packs
 rm -rf ${ASSETPACKS}/out
 mkdir ${ASSETPACKS}/out
-# for PACK_NAME in asset_pack_1 asset_pack_2
-for PACK_NAME in asset_pack_1
+for PACK_NAME in asset_pack_1 asset_pack_2
 do
 	IN_DIR=${ASSETPACKS}/${PACK_NAME}
 	OUT_DIR=${ASSETPACKS}/out/${PACK_NAME}
