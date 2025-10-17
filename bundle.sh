@@ -30,7 +30,7 @@ do
 
 	echo "---- LINK ASSET PACK RESOURCES"
 	mkdir ${OUT_DIR}
-	java -jar ${BOB} aapt2 -- link --proto-format --output-to-dir -o ${OUT_DIR} --manifest ${IN_DIR}/manifest/AndroidManifest.xml -A ${IN_DIR}/assets
+	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools aapt2 link --proto-format --output-to-dir -o ${OUT_DIR} --manifest ${IN_DIR}/manifest/AndroidManifest.xml -A ${IN_DIR}/assets
 	rm ${OUT_DIR}/resources.pb
 	mkdir ${OUT_DIR}/manifest
 	mv ${OUT_DIR}/AndroidManifest.xml ${OUT_DIR}/manifest/AndroidManifest.xml
@@ -39,7 +39,7 @@ do
 	echo "---- CREATE AAB FILE FOR ASSET PACK"
 	pushd ${OUT_DIR}
 	zip -r -0 ${PACK_NAME}.zip .
-	java -jar ${BOB} bundletool -- build-bundle --modules ${PACK_NAME}.zip --config ${IN_DIR}/bundleconfig.json --output ${ASSETPACKS}/out/${PACK_NAME}.aab
+	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools bundletool build-bundle --modules ${PACK_NAME}.zip --config ${IN_DIR}/bundleconfig.json --output ${ASSETPACKS}/out/${PACK_NAME}.aab
 	rm ${PACK_NAME}.zip
 	popd
 
@@ -58,22 +58,22 @@ done
 
 # sign .aab
 echo "---- SIGN AAB"
-java -jar ${BOB} jarsigner -- -verbose -keystore debug.keystore -storepass android -keypass android ${MAIN_AAB} androiddebugkey
+java -cp ${BOB} com.dynamo.bob.tools.AndroidTools jarsigner -verbose -keystore debug.keystore -storepass android -keypass android ${MAIN_AAB} androiddebugkey
 
 
 if [ ${LOCAL_TESTING} = true ]; then
 	# create .apks file for testing
 	echo "---- CREATE APKS FOR TESTING"
-	java -jar ${BOB} bundletool -- build-apks --bundle=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.aab --output=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.apks --local-testing
+	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools bundletool build-apks --bundle=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.aab --output=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.apks --local-testing
 else
 	# create universal .apks file
 	echo "---- CREATE UNIVERSAL APKS"
-	java -jar ${BOB} bundletool -- build-apks --mode=UNIVERSAL --bundle=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.aab --output=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.apks --ks=debug.keystore --ks-pass=pass:android --key-pass=pass:android --ks-key-alias=androiddebugkey
+	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools bundletool build-apks --mode=UNIVERSAL --bundle=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.aab --output=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.apks --ks=debug.keystore --ks-pass=pass:android --key-pass=pass:android --ks-key-alias=androiddebugkey
 fi
 
 
 if [ ${VARIANT} = "debug" ]; then
 	# install on device
 	echo "---- INSTALL ON DEVICE"
-	java -jar bob.jar bundletool -- install-apks --apks=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.apks
+	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools bundletool install-apks --apks=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.apks
 fi
