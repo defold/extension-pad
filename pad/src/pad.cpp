@@ -437,6 +437,10 @@ static void LuaInit(lua_State* L)
      * @field EVENT_DIALOG_ERROR
      */
      SETCONSTANT(EVENT_DIALOG_ERROR, 8);
+    /**
+     * @field EVENT_LOG
+     */
+     SETCONSTANT(EVENT_LOG, 9);
 
 
     /**
@@ -482,80 +486,80 @@ static void LuaInit(lua_State* L)
 
 
 
-    /** Download not permitted under the current device circumstances
-     * @field ERRORCODE_ACCESS_DENIED
+    /** 
+     * @field ERRORCODE_NO_ERROR
      */
-    SETCONSTANT(ERRORCODE_ACCESS_DENIED, -7)
-
-    /** The Asset Delivery API isn't available.
-     * @field ERRORCODE_API_NOT_AVAILABLE
-     */
-    SETCONSTANT(ERRORCODE_API_NOT_AVAILABLE, -5)
-
-    /** The app isn't owned by any user on this device.
-     * @field ERRORCODE_APP_NOT_OWNED
-     */
-    SETCONSTANT(ERRORCODE_APP_NOT_OWNED, -13)
+    SETCONSTANT(ERRORCODE_NO_ERROR, 0)
 
     /** The requesting app is unavailable.
      * @field ERRORCODE_APP_UNAVAILABLE
      */
     SETCONSTANT(ERRORCODE_APP_UNAVAILABLE, -1)
 
-    /** Returned if AssetPackManager.showConfirmationDialog(Activity) is called but no asset packs require user confirmation.
-     * @field ERRORCODE_CONFIRMATION_NOT_REQUIRED
+    /** The requested asset pack isn't available.
+     * @field ERRORCODE_PACK_UNAVAILABLE
      */
-    SETCONSTANT(ERRORCODE_CONFIRMATION_NOT_REQUIRED, -14)
-
-    /** The requested download isn't found.
-     * @field ERRORCODE_DOWNLOAD_NOT_FOUND
-     */
-    SETCONSTANT(ERRORCODE_DOWNLOAD_NOT_FOUND, -4)
-
-    /** Asset pack download failed due to insufficient storage.
-     * @field ERRORCODE_INSUFFICIENT_STORAGE
-     */
-    SETCONSTANT(ERRORCODE_INSUFFICIENT_STORAGE, -10)
-
-    /** Unknown error downloading an asset pack.
-     * @field ERRORCODE_INTERNAL_ERROR
-     */
-    SETCONSTANT(ERRORCODE_INTERNAL_ERROR, -100)
+    SETCONSTANT(ERRORCODE_PACK_UNAVAILABLE, -2)
 
     /** The request is invalid.
      * @field ERRORCODE_INVALID_REQUEST
      */
     SETCONSTANT(ERRORCODE_INVALID_REQUEST, -3)
 
+    /** The requested download isn't found.
+     * @field ERRORCODE_DOWNLOAD_NOT_FOUND
+     */
+    SETCONSTANT(ERRORCODE_DOWNLOAD_NOT_FOUND, -4)
+
+    /** The Asset Delivery API isn't available.
+     * @field ERRORCODE_API_NOT_AVAILABLE
+     */
+    SETCONSTANT(ERRORCODE_API_NOT_AVAILABLE, -5)
+
     /** Network error.
      * @field ERRORCODE_NETWORK_ERROR
      */
     SETCONSTANT(ERRORCODE_NETWORK_ERROR, -6)
 
-    /** Returned if AssetPackManager.showCellularDataConfirmation(Activity) is called but no asset packs are waiting for Wi-Fi.
-     * @field ERRORCODE_NETWORK_UNRESTRICTED
+    /** Download not permitted under the current device circumstances
+     * @field ERRORCODE_ACCESS_DENIED
      */
-    SETCONSTANT(ERRORCODE_NETWORK_UNRESTRICTED, -12)
+    SETCONSTANT(ERRORCODE_ACCESS_DENIED, -7)
 
-    /** 
-     * @field ERRORCODE_NO_ERROR
+    /** Asset pack download failed due to insufficient storage.
+     * @field ERRORCODE_INSUFFICIENT_STORAGE
      */
-    SETCONSTANT(ERRORCODE_NO_ERROR, 0)
-
-    /** The requested asset pack isn't available.
-     * @field ERRORCODE_PACK_UNAVAILABLE
-     */
-    SETCONSTANT(ERRORCODE_PACK_UNAVAILABLE, -2)
+    SETCONSTANT(ERRORCODE_INSUFFICIENT_STORAGE, -10)
 
     /** The Play Store app is either not installed or not the official version.
      * @field ERRORCODE_PLAY_STORE_NOT_FOUND
      */
     SETCONSTANT(ERRORCODE_PLAY_STORE_NOT_FOUND, -11)
 
+    /** Returned if AssetPackManager.showCellularDataConfirmation(Activity) is called but no asset packs are waiting for Wi-Fi.
+     * @field ERRORCODE_NETWORK_UNRESTRICTED
+     */
+    SETCONSTANT(ERRORCODE_NETWORK_UNRESTRICTED, -12)
+
+    /** The app isn't owned by any user on this device.
+     * @field ERRORCODE_APP_NOT_OWNED
+     */
+    SETCONSTANT(ERRORCODE_APP_NOT_OWNED, -13)
+
+    /** Returned if AssetPackManager.showConfirmationDialog(Activity) is called but no asset packs require user confirmation.
+     * @field ERRORCODE_CONFIRMATION_NOT_REQUIRED
+     */
+    SETCONSTANT(ERRORCODE_CONFIRMATION_NOT_REQUIRED, -14)
+
     /** The installed app version is not recognized by Play.
      * @field ERRORCODE_UNRECOGNIZED_INSTALLATION
      */
     SETCONSTANT(ERRORCODE_UNRECOGNIZED_INSTALLATION, -15)
+
+    /** Unknown error downloading an asset pack.
+     * @field ERRORCODE_INTERNAL_ERROR
+     */
+    SETCONSTANT(ERRORCODE_INTERNAL_ERROR, -100)
 
 
     #undef SETCONSTANT

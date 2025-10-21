@@ -6,6 +6,8 @@ import android.content.Context;
 import android.app.Activity;
 import android.util.Log;
 
+import java.lang.Throwable;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
@@ -30,7 +32,8 @@ import com.google.android.play.core.assetpacks.AssetPackLocation;
 import com.google.android.play.core.assetpacks.AssetPackStateUpdateListener;
 import com.google.android.play.core.assetpacks.model.AssetPackErrorCode;
 import com.google.android.play.core.assetpacks.model.AssetPackStatus;
-
+import com.google.android.play.core.assetpacks.AssetPackException;
+import com.google.android.gms.tasks.RuntimeExecutionException;
 
 public class PADJNI implements AssetPackStateUpdateListener {
     private static final String TAG = "defold";
@@ -48,6 +51,7 @@ public class PADJNI implements AssetPackStateUpdateListener {
         EVENT_DIALOG_DECLINED,
         EVENT_DIALOG_CANCELED,
         EVENT_DIALOG_ERROR,
+        EVENT_LOG,
     }
 
     private static class PADEvent {
@@ -70,7 +74,6 @@ public class PADJNI implements AssetPackStateUpdateListener {
 
     public PADJNI(Activity activity) {
         this.activity = activity;
-        Log.d(TAG, "Constructor");
         assetPackManager = AssetPackManagerFactory.getInstance(activity);
         assetPackManager.registerListener(this);
     }
@@ -87,6 +90,11 @@ public class PADJNI implements AssetPackStateUpdateListener {
         synchronized (events) {
             events.add(event);
         }
+    }
+
+    private void Log(String message) {
+        // Log.d(TAG, message);
+        // AddEvent(TAG, PADEventType.EVENT_LOG, message);
     }
 
     public String GetNextEvent() {
@@ -249,27 +257,44 @@ public class PADJNI implements AssetPackStateUpdateListener {
 
     public void ShowConfirmationDialog(String packName) {
         Log.d(TAG, "ShowConfirmationDialog " + packName);
-        // Task<Integer> task = assetPackManager.showConfirmationDialog(activity);
-        // task.addOnCompleteListener(new OnCompleteListener<Integer>() {
-        //     @Override
-        //     public void onComplete(@NonNull Task<Integer> task) {
-        //         PADEventType eventType = (task.getResult() == Activity.RESULT_OK) ? PADEventType.EVENT_DIALOG_CONFIRMED : PADEventType.EVENT_DIALOG_DECLINED;
-        //         AddEvent(packName, eventType);
-        //     }
-        // });
-        // task.addOnCanceledListener(new OnCanceledListener() {
-        //     @Override
-        //     public void onCanceled() {
-        //         AddEvent(packName, PADEventType.EVENT_DIALOG_CANCELED);
-        //     }
-        // });
-        // task.addOnFailureListener(new OnFailureListener() {
-        //     @Override
-        //     public void onFailure(Exception e) {
-        //         AddEvent(packName, PADEventType.EVENT_DIALOG_ERROR, e.getMessage());
-        //     }
-        // });
-
+        Task<Integer> task = assetPackManager.showConfirmationDialog(activity);
+        task.addOnCompleteListener(new OnCompleteListener<Integer>() {
+            @Override
+            public void onComplete(@NonNull Task<Integer> task) {
+                Log.d(TAG, "ShowConfirmationDialog onComplete");
+                try {
+                    PADEventType eventType = (task.getResult() == Activity.RESULT_OK) ? PADEventType.EVENT_DIALOG_CONFIRMED : PADEventType.EVENT_DIALOG_DECLINED;
+                    AddEvent(packName, eventType);
+                }
+                catch (RuntimeExecutionException e) {
+                    Throwable cause = e.getCause();
+                    if ((cause != null) && (cause instanceof AssetPackException)) {
+                        AssetPackException ape = (AssetPackException)cause;
+                        Log.d(TAG, "ShowConfirmationDialog AssetPackException error: " + ape.getErrorCode() + " status: " + ape.getStatusCode());
+                        AddEvent(packName, PADEventType.EVENT_DIALOG_ERROR, e.getMessage());
+                        AddEvent(packName, PADEventType.EVENT_LOG, "AssetPackException error: " + ape.getErrorCode() + " status: " + ape.getStatusCode());
+                    }
+                    else {
+                        Log.d(TAG, "ShowConfirmationDialog RuntimeExecutionException");
+                        AddEvent(packName, PADEventType.EVENT_DIALOG_ERROR, e.getMessage());
+                    }
+                }
+            }
+        });
+        task.addOnCanceledListener(new OnCanceledListener() {
+            @Override
+            public void onCanceled() {
+                Log.d(TAG, "ShowConfirmationDialog onCanceled");
+                AddEvent(packName, PADEventType.EVENT_DIALOG_CANCELED);
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "ShowConfirmationDialog onFailure");
+                AddEvent(packName, PADEventType.EVENT_DIALOG_ERROR, e.getMessage());
+            }
+        });
     }
 
     @Override

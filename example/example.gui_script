@@ -128,6 +128,8 @@ function init(self)
 		log("pad event for %s", event.pack_name)
 		if event.event_type == pad.EVENT_PACK_STATE_UPDATED then
 			log_pack_state(event.pack_name)
+		elseif event.event_type == pad.EVENT_LOG then
+			log(event.extra)
 		else
 			log(event)
 		end
@@ -147,24 +149,24 @@ function on_input(self, action_id, action)
 	if not pad then return end
 
 	if pressed("fetch1/button", action) then
-		log("fetch")
+		log("fetch1")
 		pad.fetch(ASSETPACK1_NAME)
 	elseif pressed("remove1/button", action) then
-		log("remove")
+		log("remove1")
 		msg.post(ASSETPACK1_PROXY, "unload")
 		liveupdate.remove_mount(ASSETPACK1_NAME)
 		pad.remove_pack(ASSETPACK1_NAME)
 	elseif pressed("get_state1/button", action) then
-		print("get_state")
+		print("get_state1")
 		pad.get_pack_state(ASSETPACK1_NAME)
 	elseif pressed("print_state1/button", action) then
-		log("print_state")
+		log("print_state1")
 		log_pack_state(ASSETPACK1_NAME)
 	elseif pressed("pack_location1/button", action) then
-		log("pack_location")
+		log("pack_location1")
 		log("get_pack_location %s", pad.get_pack_location(ASSETPACK1_NAME))
 	elseif pressed("mount1/button", action) then
-		log("mount")
+		log("mount1")
 		local path = "zip:" .. pad.get_pack_location(ASSETPACK1_NAME) .. "/assetpack1.zip"
 		log("path %s", path)
 		liveupdate.add_mount(ASSETPACK1_NAME, path, 1, function(self, path, uri, result)
@@ -175,9 +177,12 @@ function on_input(self, action_id, action)
 			end
 		end)
 	elseif pressed("missing_resources1/button", action) then
-		log("missing_resources")
+		log("missing_resources1")
 		local missing = collectionproxy.missing_resources(ASSETPACK1_PROXY)
 		log(missing)
+	elseif pressed("show_confirmation1/button", action) then
+		log("show_confirmation1")
+		pad.show_confirmation_dialog(ASSETPACK1_NAME)
 	elseif pressed("fetch2/button", action) then
 		local status = pad.get_pack_status(ASSETPACK2_NAME)
 		log("status %s", PACK_STATUS_TO_TEXT[status])

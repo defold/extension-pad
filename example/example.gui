@@ -209,6 +209,30 @@ nodes {
 }
 nodes {
   position {
+    x: 293.0
+    y: 37.0
+  }
+  type: TYPE_TEMPLATE
+  id: "show_confirmation1"
+  inherit_alpha: true
+  template: "/example/button.gui"
+}
+nodes {
+  type: TYPE_BOX
+  id: "show_confirmation1/button"
+  parent: "show_confirmation1"
+  template_node_child: true
+}
+nodes {
+  type: TYPE_TEXT
+  text: "SHOW CONFIRMATION"
+  id: "show_confirmation1/text"
+  parent: "show_confirmation1/button"
+  overridden_fields: 8
+  template_node_child: true
+}
+nodes {
+  position {
     x: 588.0
     y: 196.0
   }
