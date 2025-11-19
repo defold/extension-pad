@@ -138,10 +138,25 @@ public class PADJNI implements AssetPackStateUpdateListener {
             @Override
             public void onComplete(@NonNull Task<AssetPackStates> task) {
                 Log.d(TAG, "Fetch onComplete");
-                AssetPackStates states = task.getResult();
-                AssetPackState state = states.packStates().get(packName);
-                stateCache.put(packName, state);
-                AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
+                try {
+                    AssetPackStates states = task.getResult();
+                    AssetPackState state = states.packStates().get(packName);
+                    stateCache.put(packName, state);
+                    AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
+                }
+                catch (RuntimeExecutionException e) {
+                    Throwable cause = e.getCause();
+                    if ((cause != null) && (cause instanceof AssetPackException)) {
+                        AssetPackException ape = (AssetPackException)cause;
+                        Log.d(TAG, "Fetch AssetPackException error: " + ape.getErrorCode() + " status: " + ape.getStatusCode());
+                        AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR, e.getMessage());
+                        AddEvent(packName, PADEventType.EVENT_LOG, "AssetPackException error: " + ape.getErrorCode() + " status: " + ape.getStatusCode());
+                    }
+                    else {
+                        Log.d(TAG, "Fetch RuntimeExecutionException");
+                        AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR, e.getMessage());
+                    }
+                }
             }
         });
         task.addOnCanceledListener(new OnCanceledListener() {
@@ -174,10 +189,25 @@ public class PADJNI implements AssetPackStateUpdateListener {
             @Override
             public void onComplete(@NonNull Task<AssetPackStates> task) {
                 Log.d(TAG, "GetPackState onComplete");
-                AssetPackStates states = task.getResult();
-                AssetPackState state = states.packStates().get(packName);
-                stateCache.put(packName, state);
-                AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
+                try {
+                    AssetPackStates states = task.getResult();
+                    AssetPackState state = states.packStates().get(packName);
+                    stateCache.put(packName, state);
+                    AddEvent(packName, PADEventType.EVENT_PACK_STATE_UPDATED);
+                }
+                catch (RuntimeExecutionException e) {
+                    Throwable cause = e.getCause();
+                    if ((cause != null) && (cause instanceof AssetPackException)) {
+                        AssetPackException ape = (AssetPackException)cause;
+                        Log.d(TAG, "GetPackState AssetPackException error: " + ape.getErrorCode() + " status: " + ape.getStatusCode());
+                        AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR, e.getMessage());
+                        AddEvent(packName, PADEventType.EVENT_LOG, "AssetPackException error: " + ape.getErrorCode() + " status: " + ape.getStatusCode());
+                    }
+                    else {
+                        Log.d(TAG, "GetPackState RuntimeExecutionException");
+                        AddEvent(packName, PADEventType.EVENT_PACK_STATE_ERROR, e.getMessage());
+                    }
+                }
             }
         });
         task.addOnCanceledListener(new OnCanceledListener() {
