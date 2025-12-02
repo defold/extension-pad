@@ -3,8 +3,8 @@ set -e
 APP_NAME=PlayAssetDelivery
 ASSETPACKS=$(realpath assetpacks)
 BOB=$(realpath bob.jar)
-VARIANT=release
-LOCAL_TESTING=false
+VARIANT=debug
+LOCAL_TESTING=true
 
 
 # make build
