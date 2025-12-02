@@ -25,7 +25,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    namespace = "com.defold.defold"
+    namespace = "com.defold.pad"
 }
 
 java {
