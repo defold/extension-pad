@@ -1,3 +1,10 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 buildscript {
     repositories {
         google()
@@ -8,32 +15,12 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 34
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     namespace = "com.defold.pad"
-}
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
-}
-
-android {
     assetPacks = [":asset_pack_1", ":asset_pack_2"]
 }

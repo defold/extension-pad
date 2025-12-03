@@ -21,13 +21,12 @@ java -jar ${BOB} --defoldsdk=1ba9e1aa422166864c3267f03f5110144b745c1e --platform
 
 
 # create asset packs
-rm -rf ${ASSETPACKS}/out
-mkdir ${ASSETPACKS}/out
-cd ${ASSETPACKS}
-
 echo "---- CREATE ASSET PACKS"
+pushd ${ASSETPACKS}
 gradle assetPackDebugPreBundleTask
 
+rm -rf ${ASSETPACKS}/out
+mkdir ${ASSETPACKS}/out
 for PACK_NAME in asset_pack_1 asset_pack_2
 do
 	OUT_DIR=${ASSETPACKS}/out/${PACK_NAME}
@@ -41,45 +40,7 @@ do
 	zip -r -0 -D ${MAIN_AAB} ${PACK_NAME}
 	popd
 done
-
-cd ..
-
-
-# # create asset packs
-# rm -rf ${ASSETPACKS}/out
-# mkdir ${ASSETPACKS}/out
-# for PACK_NAME in asset_pack_1 asset_pack_2
-# do
-# 	IN_DIR=${ASSETPACKS}/${PACK_NAME}
-# 	OUT_DIR=${ASSETPACKS}/out/${PACK_NAME}
-
-# 	echo "---- LINK ASSET PACK RESOURCES"
-# 	mkdir ${OUT_DIR}
-# 	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools aapt2 link --proto-format --output-to-dir -o ${OUT_DIR} --manifest ${IN_DIR}/manifest/AndroidManifest.xml -A ${IN_DIR}/assets
-# 	rm ${OUT_DIR}/resources.pb
-# 	mkdir ${OUT_DIR}/manifest
-# 	mv ${OUT_DIR}/AndroidManifest.xml ${OUT_DIR}/manifest/AndroidManifest.xml
-
-# 	# create aab file for asset pack
-# 	echo "---- CREATE AAB FILE FOR ASSET PACK"
-# 	pushd ${OUT_DIR}
-# 	zip -r -0 ${PACK_NAME}.zip .
-# 	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools bundletool build-bundle --modules ${PACK_NAME}.zip --config ${IN_DIR}/bundleconfig.json --output ${ASSETPACKS}/out/${PACK_NAME}.aab
-# 	rm ${PACK_NAME}.zip
-# 	popd
-
-# 	# remove intermediate files and unpack created aab file
-# 	# add unzipped aab file to main aab
-# 	echo "---- ADD ASSET PACK TO MAIN AAB"
-# 	rm -rf ${OUT_DIR}
-# 	mkdir ${OUT_DIR}
-# 	unzip ${ASSETPACKS}/out/${PACK_NAME}.aab -d ${OUT_DIR}
-# 	rm ${OUT_DIR}/bundleconfig.pb
-# 	pushd ${OUT_DIR}
-# 	# -D do not write directory entries to the archive
-# 	zip -r -0 -D ${MAIN_AAB} .
-# 	popd
-# done
+popd
 
 # sign .aab
 echo "---- SIGN AAB"
