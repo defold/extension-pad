@@ -1,0 +1,2 @@
+include ':asset_pack_1'
+include ':asset_pack_2'

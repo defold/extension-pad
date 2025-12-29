@@ -16,4 +16,7 @@ debug.keystore
 AGENTS.md
 bundle
 assetpacks/out
+assetpacks/build
+assetpacks/*/build
 bob.jar
+assetpacks/.gradle
