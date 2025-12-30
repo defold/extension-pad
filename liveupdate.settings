@@ -1,5 +1,5 @@
 [liveupdate]
 mode = Zip
-zip-filepath = ./assetpacks/asset_pack_1/src/main/assets
+zip-filepath = ./assetpacks/asset_pack_1/assets
 zip-filename = assetpack1
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:dist="http://schemas.android.com/apk/distribution" package="com.defold.pad" split="asset_pack_2">
+    <dist:module dist:type="asset-pack">
+        <dist:delivery>
+            <dist:fast-follow/>
+        </dist:delivery>
+        <dist:fusing dist:include="true"/>
+    </dist:module>
+</manifest>
