@@ -17,7 +17,7 @@ MAIN_AAB=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.aab
 # build .aab file
 # use liveupdate to get excluded content as a zip file (see liveupdate.settings)
 echo "---- BUILD MAIN AAB"
-java -jar ${BOB} --platform=armv7-android --archive --variant=${VARIANT} --liveupdate=yes --bundle-output=${BUNDLE_DIR} --bundle-format=aab --build-server=https://build-stage.defold.com build bundle
+java -jar ${BOB} --platform=armv7-android --archive --variant=${VARIANT} --liveupdate=yes --bundle-output=${BUNDLE_DIR} --bundle-format=aab --build-server=https://build.defold.com build bundle
 
 
 # create asset packs
