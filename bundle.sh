@@ -3,8 +3,8 @@ set -e
 APP_NAME=PlayAssetDelivery
 ASSETPACKS=$(realpath assetpacks)
 BOB=$(realpath bob.jar)
-VARIANT=release
-LOCAL_TESTING=false
+VARIANT=debug
+LOCAL_TESTING=true
 
 
 # make build
@@ -17,7 +17,7 @@ MAIN_AAB=${BUNDLE_DIR}/${APP_NAME}/${APP_NAME}.aab
 # build .aab file
 # use liveupdate to get excluded content as a zip file (see liveupdate.settings)
 echo "---- BUILD MAIN AAB"
-java -jar ${BOB} --defoldsdk=1ba9e1aa422166864c3267f03f5110144b745c1e --platform=armv7-android --archive --variant=${VARIANT} --liveupdate=yes --bundle-output=${BUNDLE_DIR} --bundle-format=aab build bundle
+java -jar ${BOB} --platform=armv7-android --archive --variant=${VARIANT} --liveupdate=yes --bundle-output=${BUNDLE_DIR} --bundle-format=aab --build-server=https://build-stage.defold.com build bundle
 
 
 # create asset packs
@@ -35,21 +35,18 @@ do
 	mkdir ${OUT_DIR}/manifest
 	mv ${OUT_DIR}/AndroidManifest.xml ${OUT_DIR}/manifest/AndroidManifest.xml
 
-	# create aab file for asset pack
-	echo "---- CREATE AAB FILE FOR ASSET PACK"
+	# create zip file for asset pack
+	echo "---- CREATE ZIP FILE FOR ASSET PACK"
 	pushd ${OUT_DIR}
 	zip -r -0 ${PACK_NAME}.zip .
-	java -cp ${BOB} com.dynamo.bob.tools.AndroidTools bundletool build-bundle --modules ${PACK_NAME}.zip --config ${IN_DIR}/bundleconfig.json --output ${ASSETPACKS}/out/${PACK_NAME}.aab
-	rm ${PACK_NAME}.zip
+	mv ${PACK_NAME}.zip ${ASSETPACKS}/out/${PACK_NAME}.zip
 	popd
 
-	# remove intermediate files and unpack created aab file
-	# add unzipped aab file to main aab
+	# unpack created zip file and add to main aab
 	echo "---- ADD ASSET PACK TO MAIN AAB"
 	rm -rf ${OUT_DIR}
 	mkdir ${OUT_DIR}
-	unzip ${ASSETPACKS}/out/${PACK_NAME}.aab -d ${OUT_DIR}
-	rm ${OUT_DIR}/bundleconfig.pb
+	unzip ${ASSETPACKS}/out/${PACK_NAME}.zip -d ${OUT_DIR}/${PACK_NAME}
 	pushd ${OUT_DIR}
 	# -D do not write directory entries to the archive
 	zip -r -0 -D ${MAIN_AAB} .

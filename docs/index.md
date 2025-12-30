@@ -19,23 +19,17 @@ Select `Project->Fetch Libraries` once you have added the version to `game.proje
 
 ## Creating asset packs
 
-Creating an asset packs involves using the Android tools `aapt2` and `bundletool` and the JDK tool `jarsigner`. All are included in the Defold command line tool `bob.jar` and can be used directly from Bob. There are four steps to create one or more asset packs and include them in the application bundle:
+Creating an asset pack involves using the Android tools `aapt2` and `bundletool` and the JDK tool `jarsigner`. All are included in the Defold command line tool `bob.jar` and can be used directly from Bob. There are four steps to create one or more asset packs and include them in the application bundle:
 
 1. Compile assets
-2. Create asset bundles
-3. Add asset bundles to application bundle
+2. Create asset pack
+3. Add asset pack to application bundle
 4. Sign the application bundle
 
 
 ### Compile assets
 
-The first step is to run `aapt2` to prepare files for use by the bundle tool. The `aapt2` command takes an `AndroidManifest.xml` and a folder of assets as input and outputs processed files to an output folder. When used as shown below `aapt2` will copy the assets and write a binary version of the `AndroidManifest.xml` to the output folder. The command will also produce a `resources.pb` but this is not needed for assets packs.
-
-```sh
-java -cp bob.jar com.dynamo.bob.tools.AndroidTools aapt2 link --proto-format --output-to-dir -o out --manifest AndroidManifest.xml -A assets
-# resources.pb is not needed for asset packs
-rm out/resources.pb
-```
+The first step is to run `aapt2` to compile the assets used in an asset pack. The `aapt2` command takes an `AndroidManifest.xml` and a folder of assets as input and outputs processed files to an output folder.
 
 The `AndroidManifest.xml` configures the asset pack's identifier and delivery mode:
 
@@ -53,43 +47,56 @@ The `AndroidManifest.xml` configures the asset pack's identifier and delivery mo
 
 Pay attention to the `<dist:delivery>` tag which specifies the [delivery mode](https://developer.android.com/guide/playcore/asset-delivery).
 
-
-### Create asset bundle
-
-The next step is to create an asset bundle using the `bundletool` command. The `bundletool` command will produce an .aab file from a bundle configuration and a zip file containing the assets and the binary version of the manifest file produced by `aapt2` above.
+The `aapt2` command will copy the assets and write a binary version of the `AndroidManifest.xml` to the output folder. The command will also produce a `resources.pb` but this is not needed for assets packs.
 
 ```sh
-java -cp bob.jar com.dynamo.bob.tools.AndroidTools bundletool build-bundle --modules asset_pack_1.zip --config bundleconfig.json --output asset_pack_1.aab
+java -cp bob.jar com.dynamo.bob.tools.AndroidTools aapt2 link --proto-format --output-to-dir -o out --manifest AndroidManifest.xml -A assets
 ```
 
-The `asset_pack_1.zip` must have the following structure:
+The resulting files and folders:
 
 ```
-<root>
+out
+├── assets
+│   └── <file(s)>
+└── AndroidManifest.xml   <-- binary version from aapt2
+└── resources.pb          <-- not needed
+```
+
+
+### Create asset pack
+
+The next step is to create an asset pack zip archive from the compiled assets:
+
+```sh
+# resources.pb is not needed for the asset pack
+rm out/resources.pb
+# move compiled AndroidManifest.xml to correct location
+mkdir out/manifest
+mv out/AndroidManifest.xml out/manifest/AndroidManifest.xml
+# create an uncompressed zip archive of asset pack
+cd out
+zip -r -0 assetpack.zip .
+```
+
+This will produce a zip archive with the following structure:
+
+```
+assetpack.zip
 ├── assets
 │   └── <file(s)>
 └── manifest
-    └── AndroidManifest.xml   <-- binary version from aapt2
+    └── AndroidManifest.xml
 ```
 
-The `bundleconfig.json` is only needed to tell `bundletool` that it is producing a bundle containing only assets:
+### Add asset pack to the application bundle
 
-```json
-{
-  "type": "ASSET_ONLY"
-}
-```
-
-
-### Add asset bundles to the application bundle
-
-When all asset bundles have been produced they need to be merged into the the main application bundle. For each asset bundle unzip it, remove the `bundleconfig.pb` and then write the files to the main application bundle.
+When the asset pack has been produced it needs to be merged into the the main application bundle. Unzip the asset pack archive it and write the files to the main application bundle.
 
 ```sh
-unzip asset_pack_1.aab -d out
+# unzip asset pack to folder
+unzip assetpack.zip -d out/assetpack
 cd out
-# bundleconfig.pb is not needed
-rm bundleconfig.pb
 # -D do not write directory entries to the archive
 zip -r -0 -D main.aab .
 ```
